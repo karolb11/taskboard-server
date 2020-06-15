@@ -1,11 +1,13 @@
 package com.taskboard.model;
 
+import lombok.Data;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "local_roles")
+@Data
 public class LocalRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,19 +18,4 @@ public class LocalRole {
     @Column(length = 60)
     private LocalRoleName name;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalRoleName getName() {
-        return name;
-    }
-
-    public void setName(LocalRoleName name) {
-        this.name = name;
-    }
 }

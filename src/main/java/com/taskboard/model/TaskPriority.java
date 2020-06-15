@@ -2,12 +2,14 @@ package com.taskboard.model;
 
 import com.taskboard.model.TaskPriorityName;
 import com.taskboard.model.TaskStateName;
+import lombok.Data;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name= "task_priorities")
+@Data
 public class TaskPriority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,19 +27,4 @@ public class TaskPriority {
     public TaskPriority() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public TaskPriorityName getName() {
-        return name;
-    }
-
-    public void setName(TaskPriorityName name) {
-        this.name = name;
-    }
 }

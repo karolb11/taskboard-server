@@ -1,5 +1,8 @@
 package com.taskboard.payload;
 
+import lombok.Data;
+
+@Data
 public class BoardRequest {
     String name;
     String description;
@@ -7,19 +10,4 @@ public class BoardRequest {
     public BoardRequest() {
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

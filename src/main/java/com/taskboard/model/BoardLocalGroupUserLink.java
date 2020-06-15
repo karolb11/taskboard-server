@@ -1,8 +1,11 @@
 package com.taskboard.model;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
 @Entity
+@Data
 public class BoardLocalGroupUserLink {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,38 +29,6 @@ public class BoardLocalGroupUserLink {
     public BoardLocalGroupUserLink(Board board, LocalRole localRole, User user) {
         this.user = user;
         this.board = board;
-        this.localRole = localRole;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Board getBoard() {
-        return board;
-    }
-
-    public void setBoard(Board board) {
-        this.board = board;
-    }
-
-    public LocalRole getLocalRole() {
-        return localRole;
-    }
-
-    public void setLocalRole(LocalRole localRole) {
         this.localRole = localRole;
     }
 }

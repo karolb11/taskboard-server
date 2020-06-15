@@ -1,7 +1,9 @@
 package com.taskboard.payload;
 
 import com.taskboard.model.Task;
+import lombok.Data;
 
+@Data
 public class TaskResponse {
     Long id;
     String name;
@@ -16,22 +18,6 @@ public class TaskResponse {
 
     public TaskResponse(Long id, String name) {
         this.id = id;
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
     }
 }

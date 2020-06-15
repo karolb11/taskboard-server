@@ -1,5 +1,8 @@
 package com.taskboard.payload;
 
+import lombok.Data;
+
+@Data
 public class BoardLocalGroupUserLinkResponse {
     private Long boardId;
     private Long localGroupId;
@@ -14,27 +17,5 @@ public class BoardLocalGroupUserLinkResponse {
         this.userId = userId;
     }
 
-    public Long getBoardId() {
-        return boardId;
-    }
 
-    public void setBoardId(Long boardId) {
-        this.boardId = boardId;
-    }
-
-    public Long getLocalGroupId() {
-        return localGroupId;
-    }
-
-    public void setLocalGroupId(Long localGroupId) {
-        this.localGroupId = localGroupId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 }

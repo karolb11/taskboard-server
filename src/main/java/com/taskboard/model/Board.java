@@ -25,7 +25,7 @@ public class Board extends DateAudit {
 
     @Size(max = 1000) //@Size(max = 1000, message = "khym")
     private String description;
-
+    
     @OneToMany
     @JoinColumn(name = "board_id")
     private Set<BoardLocalGroupUserLink> boardLocalGroupUserLinks = new HashSet<>();

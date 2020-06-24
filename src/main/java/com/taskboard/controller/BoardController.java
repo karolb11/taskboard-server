@@ -1,7 +1,9 @@
 package com.taskboard.controller;
 
+import com.taskboard.model.Board;
 import com.taskboard.payload.BoardRequest;
 import com.taskboard.payload.BoardView;
+import com.taskboard.payload.BoardViewResponse;
 import com.taskboard.security.CurrentUser;
 import com.taskboard.security.UserPrincipal;
 import com.taskboard.service.BoardService;
@@ -45,8 +47,9 @@ public class BoardController {
     @PostMapping
     public ResponseEntity<?> addNewBoard(@CurrentUser UserPrincipal userPrincipal, @RequestBody BoardRequest boardRequest) {
         try {
-            boardService.addNewBoard(userPrincipal.getId(), boardRequest);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            Board board = boardService.addNewBoard(userPrincipal.getId(), boardRequest);
+            BoardViewResponse res = new BoardViewResponse(board.getId(), board.getName(), board.getDescription());
+            return new ResponseEntity<>(res, HttpStatus.CREATED);
         }
         catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

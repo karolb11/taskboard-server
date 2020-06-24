@@ -56,16 +56,16 @@ public class BoardService {
     }
 
     @Transactional
-    public void addNewBoard(Long userId, BoardRequest boardRequest) throws NotFoundException {
+    public Board addNewBoard(Long userId, BoardRequest boardRequest) throws NotFoundException {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("wrong userId"));
-        addNewBoard(user, boardRequest);
+        return addNewBoard(user, boardRequest);
     }
 
     @Transactional
-    public void addNewBoard(User user, BoardRequest boardRequest) throws NotFoundException {
+    public Board addNewBoard(User user, BoardRequest boardRequest) throws NotFoundException {
         Board board = new Board(boardRequest.getName(), boardRequest.getDescription());
         board = boardRepository.save(board);
         localRoleService.grantRoleToUser(board, user, LocalRoleName.LOCAL_ROLE_OWNER);
-
+        return board;
     }
 }

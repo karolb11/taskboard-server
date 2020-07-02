@@ -1,5 +1,6 @@
 package com.taskboard.model;
 
+import com.sun.istack.NotNull;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -23,6 +24,9 @@ public class BoardLocalGroupUserLink {
     @JoinColumn(name = "local_role_id", nullable = false)
     private LocalRole localRole;
 
+    @NotNull
+    private boolean accepted;
+
     public BoardLocalGroupUserLink() {
     }
 
@@ -30,5 +34,11 @@ public class BoardLocalGroupUserLink {
         this.user = user;
         this.board = board;
         this.localRole = localRole;
+    }
+    public BoardLocalGroupUserLink(Board board, LocalRole localRole, User user, boolean accepted) {
+        this.user = user;
+        this.board = board;
+        this.localRole = localRole;
+        this.accepted = accepted;
     }
 }

@@ -1,15 +1,13 @@
 package com.taskboard.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.taskboard.model.audit.DateAudit;
 import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "boards")
@@ -28,11 +26,12 @@ public class Board extends DateAudit {
     
     @OneToMany
     @JoinColumn(name = "board_id")
-    private Set<BoardLocalGroupUserLink> boardLocalGroupUserLinks = new HashSet<>();
+    private List<BoardLocalGroupUserLink> boardLocalGroupUserLinks;
 
-    @OneToMany
-    @JoinColumn(name="board_id")
-    private Set<Task> tasks = new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "board", cascade = CascadeType.ALL)
+    private List<Task> tasks;
+
+    private boolean archived;
 
     public Board() {
     }

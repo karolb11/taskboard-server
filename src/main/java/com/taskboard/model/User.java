@@ -7,10 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -49,11 +46,11 @@ public class User extends DateAudit {
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles;
 
     @OneToMany
     @JoinColumn(name = "user_id")
-    private Set<BoardLocalGroupUserLink> boardLocalGroupUserLinks = new HashSet<>();
+    private List<BoardLocalGroupUserLink> boardLocalGroupUserLinks;
 
     public User() {
 

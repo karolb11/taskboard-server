@@ -2,7 +2,8 @@ package com.taskboard.service;
 
 import com.taskboard.model.*;
 import com.taskboard.payload.BoardRequest;
-import com.taskboard.payload.BoardView;
+import com.taskboard.payload.BoardUserResponse;
+import com.taskboard.payload.BoardViewResponse;
 import com.taskboard.payloadConverter.BoardMapper;
 import com.taskboard.repository.BoardLocalGroupUserLinkRepository;
 import com.taskboard.repository.BoardRepository;
@@ -12,10 +13,11 @@ import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class BoardService {
@@ -41,18 +43,19 @@ public class BoardService {
         this.localRoleService = localRoleService;
     }
 
-    public List<BoardView> getUsersBoards(Long userId) throws NotFoundException {
+    public List<BoardViewResponse> getUsersBoards(Long userId) throws NotFoundException {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("wrong userId"));
         return getUsersBoards(user);
     }
 
-    public List<BoardView> getUsersBoards(User user) {
-        Iterable<BoardLocalGroupUserLink> boardLocalGroupUserLinkByUser= boardLocalGroupUserLinkRepository.findByUser(user);
-        Set<Long> userBoardsIds = new HashSet<>();
-        boardLocalGroupUserLinkByUser.forEach(item -> {
-            userBoardsIds.add(item.getId());
-        });
-        return boardRepository.findBoardViewByIdIn(userBoardsIds);
+    public List<BoardViewResponse> getUsersBoards(User user) {
+        List<BoardLocalGroupUserLink> boardLocalGroupUserLinkByUser =
+                boardLocalGroupUserLinkRepository.findByUserAndAcceptedIsTrue(user);
+        Set<Long> boardIds = boardLocalGroupUserLinkByUser
+                .stream()
+                .map(link -> link.getBoard().getId())
+                .collect(Collectors.toSet());
+        return boardRepository.findBoardViewByIdIn(boardIds);
     }
 
     @Transactional
@@ -67,5 +70,32 @@ public class BoardService {
         board = boardRepository.save(board);
         localRoleService.grantRoleToUser(board, user, LocalRoleName.LOCAL_ROLE_OWNER);
         return board;
+    }
+
+    public Board getBoardById(Long boardId) throws NotFoundException {
+        return boardRepository.findBoardById(boardId)
+                .orElseThrow(() -> new NotFoundException("Board not found"));
+    }
+
+    public List<BoardUserResponse> getBoardMembers(Long boardId) throws NotFoundException {
+        Set<BoardLocalGroupUserLink> links = boardLocalGroupUserLinkRepository
+                .findByBoardIdAndLocalRoleGreaterThanEqual(
+                        boardId, localRoleService.findRole(LocalRoleName.LOCAL_ROLE_USER));
+        return links.stream().map(link ->
+                new BoardUserResponse(link.getUser().getId(), link.getUser().getName(), link.getLocalRole(), link.isAccepted()))
+                .collect(Collectors.toList());
+    }
+    public Set<BoardUserResponse> getBoardUsers(Long boardId) throws NotFoundException {
+        return getBoardMembersWithRole(boardId, localRoleService.findRole(LocalRoleName.LOCAL_ROLE_USER));
+    }
+
+    public Set<BoardUserResponse> getBoardMembersWithRole(Long boardId, LocalRole localRole) throws NotFoundException {
+        Set<BoardLocalGroupUserLink> boardUsers = boardLocalGroupUserLinkRepository
+                .findByBoardIdAndLocalRoleGreaterThanEqualAndAcceptedIsTrue(boardId, localRole);
+        Set<BoardUserResponse> users = boardUsers
+                .stream()
+                .map(i -> new BoardUserResponse(i.getUser().getId(), i.getUser().getName()))
+                .collect(Collectors.toSet());
+        return users;
     }
 }

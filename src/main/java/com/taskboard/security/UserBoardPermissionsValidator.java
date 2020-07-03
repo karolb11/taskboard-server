@@ -39,7 +39,7 @@ public class UserBoardPermissionsValidator {
 
     public boolean validate(User user, Board board, LocalRoleName permissionLevel){
         Iterable<BoardLocalGroupUserLink> boardLocalGroupUserLinks =
-                boardLocalGroupUserLinkRepository.findByUserAndBoard(user, board);
+                boardLocalGroupUserLinkRepository.findByUserAndBoardAndAcceptedIsTrue(user, board);
         for(BoardLocalGroupUserLink i: boardLocalGroupUserLinks) {
             if(localRoleHierarchy.isContaining(i.getLocalRole().getName(), permissionLevel)) return true;
         }

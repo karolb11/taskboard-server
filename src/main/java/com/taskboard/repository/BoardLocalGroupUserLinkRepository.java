@@ -22,4 +22,5 @@ public interface BoardLocalGroupUserLinkRepository extends JpaRepository<BoardLo
     List<BoardLocalGroupUserLink> findByBoardId(Long boardId);
     List<BoardLocalGroupUserLink> findAllByUserAndAcceptedIsFalse(User user);
     Set<BoardLocalGroupUserLink> findByBoardIdAndLocalRoleGreaterThanEqual(Long boardId, LocalRole role);
+    Iterable<BoardLocalGroupUserLink> findByUserAndBoardAndAcceptedIsTrue(User user, Board board);
 }

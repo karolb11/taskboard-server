@@ -14,6 +14,7 @@ public class TaskResponse {
     String description;
     String assignedUser;
     String state;
+    String priority;
 
     public TaskResponse(Task task) {
         this.id = task.getId();
@@ -23,6 +24,7 @@ public class TaskResponse {
             this.assignedUser = task.getAssignedUser().getName();
         }
         this.state = task.getState().getName().toString();
+        this.priority = task.getPriority().getName().toString();
     }
 }
 

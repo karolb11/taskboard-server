@@ -1,5 +1,6 @@
 package com.taskboard.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.taskboard.model.*;
 import com.taskboard.payload.BoardRequest;
 import com.taskboard.payload.BoardUserResponse;
@@ -72,15 +73,24 @@ public class BoardService {
         return board;
     }
 
+    @Transactional
+    public Board updateBoard(Long boardId, BoardRequest boardRequest) throws NotFoundException {
+        Board board = boardRepository.findBoardById(boardId)
+                .orElseThrow(() -> new NotFoundException("Board not found"));
+        board.setName(boardRequest.getName());
+        board.setDescription(boardRequest.getDescription());
+        return boardRepository.save(board);
+
+    }
+
     public Board getBoardById(Long boardId) throws NotFoundException {
         return boardRepository.findBoardById(boardId)
                 .orElseThrow(() -> new NotFoundException("Board not found"));
     }
 
     public List<BoardUserResponse> getBoardMembers(Long boardId) throws NotFoundException {
-        Set<BoardLocalGroupUserLink> links = boardLocalGroupUserLinkRepository
-                .findByBoardIdAndLocalRoleGreaterThanEqual(
-                        boardId, localRoleService.findRole(LocalRoleName.LOCAL_ROLE_USER));
+        List<BoardLocalGroupUserLink> links = boardLocalGroupUserLinkRepository
+                .findByBoardId(boardId);
         return links.stream().map(link ->
                 new BoardUserResponse(link.getUser().getId(), link.getUser().getName(), link.getLocalRole(), link.isAccepted()))
                 .collect(Collectors.toList());

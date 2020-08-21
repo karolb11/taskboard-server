@@ -45,10 +45,24 @@ public class BoardController {
     public ResponseEntity<?> getBoardById(@CurrentUser UserPrincipal currentUser, @PathVariable("id") Long id) {
         try {
             Board board = boardService.getBoardById(id);
-            BoardDetailedViewResponse res = BoardMapper.toBoardDetailedView(board);
+            BoardDetailedViewResponse res = BoardMapper.boardToBoardDetailedView(board);
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (NotFoundException e) {
             e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/{boardId}")
+    public ResponseEntity<?> updateBoard(@PathVariable Long boardId,
+                                         @CurrentUser UserPrincipal currentUser,
+                                         @RequestBody BoardRequest boardRequest) {
+        try {
+            Board board = boardService.updateBoard(boardId, boardRequest);
+            BoardViewResponse res = new BoardViewResponse(board.getId(), board.getName(), board.getDescription());
+            return new ResponseEntity<>(res, HttpStatus.CREATED);
+        }
+        catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

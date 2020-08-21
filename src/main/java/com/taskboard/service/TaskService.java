@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
@@ -51,6 +52,14 @@ public class TaskService {
                 .orElseThrow(() -> new NotFoundException("state not found"));
         if(!userBoardPermissionsValidator.validate(assignedUser, board, LocalRoleName.LOCAL_ROLE_USER))
         throw new NotFoundException("assigned user is not a member of this board");
+
+        List<SubTask> subTasks = taskRequest.getSubTasks().stream().map(
+                subTaskRequest -> SubTask.builder()
+                        .name(subTaskRequest.getName())
+                        .description(subTaskRequest.getDescription())
+                        .build()
+        ).collect(Collectors.toList());
+
         Task task = new Task(
                 taskRequest.getName(),
                 taskRequest.getDescription(),
@@ -58,9 +67,16 @@ public class TaskService {
                 author,
                 assignedUser,
                 priority,
-                state
+                state,
+                subTasks
         );
+
         taskRepository.save(task);
+    }
+
+    public Task getTaskById(Long id) throws NotFoundException {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Task not found"));
     }
 
     public List<TaskPriority> getTaskPriorities() {

@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Service
 public class BoardMapper {
-    public static BoardDetailedViewResponse toBoardDetailedView(Board board) {
+    public static BoardDetailedViewResponse boardToBoardDetailedView(Board board) {
         List<Task> tasks = board.getTasks();
         Set<TaskResponse> toDo = new HashSet<>();
         Set<TaskResponse> inProgress = new HashSet<>();

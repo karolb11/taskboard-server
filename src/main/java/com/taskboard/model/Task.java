@@ -2,16 +2,21 @@ package com.taskboard.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.taskboard.model.audit.DateAudit;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Task extends DateAudit {
 
     @Id
@@ -39,6 +44,9 @@ public class Task extends DateAudit {
     @JoinColumn(name = "assigned_user_id")
     private User assignedUser;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<SubTask> subTasks;
+
     @ManyToOne
     @JoinColumn(name = "priority_id", nullable = false)
     private TaskPriority priority;
@@ -54,7 +62,8 @@ public class Task extends DateAudit {
             User author,
             User assignedUser,
             TaskPriority priority,
-            TaskState state) {
+            TaskState state,
+            List<SubTask> subTasks) {
         this.name = name;
         this.description = description;
         this.board = board;
@@ -62,6 +71,7 @@ public class Task extends DateAudit {
         this.assignedUser = assignedUser;
         this.priority = priority;
         this.state = state;
+        this.subTasks = subTasks;
     }
 
 }

@@ -1,8 +1,10 @@
 package com.taskboard.controller;
 
+import com.taskboard.model.Task;
 import com.taskboard.model.TaskPriority;
 import com.taskboard.model.TaskState;
 import com.taskboard.payload.TaskRequest;
+import com.taskboard.payload.TaskResponse;
 import com.taskboard.security.CurrentUser;
 import com.taskboard.security.UserPrincipal;
 import com.taskboard.service.TaskService;
@@ -34,6 +36,23 @@ public class TaskController {
         }catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/{taskId}")
+    public ResponseEntity<?> getTaskById(@CurrentUser UserPrincipal currentUser, @PathVariable("taskId") Long taskId) {
+        try {
+            Task task = taskService.getTaskById(taskId);
+            TaskResponse response = new TaskResponse(task);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public ResponseEntity<?> updateTask(@CurrentUser UserPrincipal currentUser,
+                                        @PathVariable("taskId") Long taskId,
+                                        @RequestBody TaskRequest taskRequest) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/priority")

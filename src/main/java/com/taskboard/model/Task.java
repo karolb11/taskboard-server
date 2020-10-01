@@ -54,7 +54,6 @@ public class Task extends DateAudit {
     @Column(nullable = false)
     boolean archived;
 
-
     public Task(
             @Size(min = 3, max = 100) String name,
             @Size(min = 3, max = 1000) String description,

@@ -1,15 +1,17 @@
 package com.taskboard.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.taskboard.model.*;
-import com.taskboard.payload.TaskRequest;
+import com.taskboard.payload.CreateTaskRequest;
+import com.taskboard.payload.UpdateTaskRequest;
+import com.taskboard.payloadConverter.SubTaskMapper;
 import com.taskboard.repository.*;
 import com.taskboard.security.UserBoardPermissionsValidator;
 import javassist.NotFoundException;
-import org.aspectj.lang.annotation.Around;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,21 +41,21 @@ public class TaskService {
     }
 
     @Transactional
-    public void createTask(TaskRequest taskRequest, Long authorId) throws NotFoundException {
+    public void createTask(CreateTaskRequest createTaskRequest, Long authorId) throws NotFoundException {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new NotFoundException("user not found"));
-        User assignedUser = userRepository.findById(taskRequest.getAssignedUserId())
+        User assignedUser = userRepository.findById(createTaskRequest.getAssignedUserId())
                 .orElseThrow(() -> new NotFoundException("user not found"));
-        Board board = boardRepository.findBoardById(taskRequest.getBoardId())
+        Board board = boardRepository.findBoardById(createTaskRequest.getBoardId())
                 .orElseThrow(() -> new NotFoundException("board not found"));
-        TaskPriority priority = taskPriorityRepository.findById(taskRequest.getPriorityId())
+        TaskPriority priority = taskPriorityRepository.findById(createTaskRequest.getPriorityId())
                 .orElseThrow(() -> new NotFoundException("priority not found"));
-        TaskState state = taskStateRepository.findById(taskRequest.getStateId())
+        TaskState state = taskStateRepository.findById(createTaskRequest.getStateId())
                 .orElseThrow(() -> new NotFoundException("state not found"));
         if(!userBoardPermissionsValidator.validate(assignedUser, board, LocalRoleName.LOCAL_ROLE_USER))
         throw new NotFoundException("assigned user is not a member of this board");
 
-        List<SubTask> subTasks = taskRequest.getSubTasks().stream().map(
+        List<SubTask> subTasks = createTaskRequest.getSubTasks().stream().map(
                 subTaskRequest -> SubTask.builder()
                         .name(subTaskRequest.getName())
                         .description(subTaskRequest.getDescription())
@@ -61,8 +63,8 @@ public class TaskService {
         ).collect(Collectors.toList());
 
         Task task = new Task(
-                taskRequest.getName(),
-                taskRequest.getDescription(),
+                createTaskRequest.getName(),
+                createTaskRequest.getDescription(),
                 board,
                 author,
                 assignedUser,
@@ -72,6 +74,30 @@ public class TaskService {
         );
 
         taskRepository.save(task);
+    }
+
+    @Transactional
+    public Task updateTask(Long taskId, UpdateTaskRequest request) throws NotFoundException {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("task not found"));
+        User assignedUser = userRepository.findById(request.getAssignedUserId())
+                .orElseThrow(() -> new NotFoundException("user not found"));
+        TaskPriority priority = taskPriorityRepository.findById(request.getPriorityId())
+                .orElseThrow(() -> new NotFoundException("priority not found"));
+        TaskState state = taskStateRepository.findById(request.getStateId())
+                .orElseThrow(() -> new NotFoundException("state not found"));
+
+        List<SubTask> subTasks = SubTaskMapper.subTaskRequestListToSubTaskList(
+                request.getSubTasks()
+        );
+
+        task.setName(request.getName());
+        task.setDescription(request.getDescription());
+        task.setSubTasks(subTasks);
+        task.setPriority(priority);
+        task.setState(state);
+        task.setAssignedUser(assignedUser);
+        return taskRepository.save(task);
     }
 
     public Task getTaskById(Long id) throws NotFoundException {

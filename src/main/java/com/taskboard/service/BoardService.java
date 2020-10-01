@@ -92,7 +92,7 @@ public class BoardService {
         List<BoardLocalGroupUserLink> links = boardLocalGroupUserLinkRepository
                 .findByBoardId(boardId);
         return links.stream().map(link ->
-                new BoardUserResponse(link.getUser().getId(), link.getUser().getName(), link.getLocalRole(), link.isAccepted()))
+                new BoardUserResponse(link.getId(), link.getUser().getId(), link.getUser().getName(), link.getLocalRole(), link.isAccepted()))
                 .collect(Collectors.toList());
     }
     public Set<BoardUserResponse> getBoardUsers(Long boardId) throws NotFoundException {

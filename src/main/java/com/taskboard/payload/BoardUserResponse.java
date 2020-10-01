@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardUserResponse {
+    private Long invitationId;
     private Long id;
     private String name;
     private LocalRole localRole;

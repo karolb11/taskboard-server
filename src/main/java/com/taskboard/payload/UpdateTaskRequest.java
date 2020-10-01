@@ -11,12 +11,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EditTaskRequest {
+public class UpdateTaskRequest {
     private String name;
     private String description;
-    private Long boardId;
-    private AssignedUser assignedUser;
-    private TaskPriority priority;
-    private TaskState state;
-    private List<SubTaskRequest> subTasks;
+    private Long assignedUserId;
+    private Long priorityId;
+    private Long stateId;
+    private List<SubTaskRequest> SubTasks;
 }

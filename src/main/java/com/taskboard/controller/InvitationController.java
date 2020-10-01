@@ -57,4 +57,15 @@ public class InvitationController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @DeleteMapping("/{invitationId}")
+    public ResponseEntity<?> deleteInvitation(@CurrentUser UserPrincipal currentUser,
+                                              @PathVariable Long invitationId) {
+        try {
+            invitationService.deleteInvitation(invitationId);
+            return new ResponseEntity<>("Invitation deleted", HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

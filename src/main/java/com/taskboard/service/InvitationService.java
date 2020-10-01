@@ -69,4 +69,10 @@ public class InvitationService {
         invitation.setAccepted(true);
         boardLocalGroupUserLinkRepository.save(invitation);
     }
+
+    public void deleteInvitation(Long invitationId) throws NotFoundException {
+        BoardLocalGroupUserLink invitation = boardLocalGroupUserLinkRepository.findById(invitationId)
+                .orElseThrow(() -> new NotFoundException("Invitation doesn't exist"));
+        boardLocalGroupUserLinkRepository.deleteById(invitationId);
+    }
 }

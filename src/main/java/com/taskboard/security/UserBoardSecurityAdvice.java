@@ -1,19 +1,13 @@
 package com.taskboard.security;
 
 import com.taskboard.model.LocalRoleName;
-import com.taskboard.payload.BoardLocalGroupUserLinkRequest;
-import com.taskboard.payload.TaskRequest;
-import org.aspectj.lang.JoinPoint;
+import com.taskboard.payload.CreateTaskRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Aspect
 @Configuration
@@ -36,14 +30,14 @@ public class UserBoardSecurityAdvice {
             return new ResponseEntity<>("Invalid permissions", HttpStatus.FORBIDDEN);
     }
 
-    @Around("execution(* com.taskboard.controller.TaskController.createTask(..)) && args(currentUser, taskRequest)")
+    @Around("execution(* com.taskboard.controller.TaskController.createTask(..)) && args(currentUser, createTaskRequest)")
     public ResponseEntity<?> validateUserPermsToCreateTask(
             ProceedingJoinPoint joinPoint,
             UserPrincipal currentUser,
-            TaskRequest taskRequest
+            CreateTaskRequest createTaskRequest
     ) throws Throwable {
         if(userBoardPermissionsValidator
-                .validate(currentUser.getId(), taskRequest.getBoardId(), LocalRoleName.LOCAL_ROLE_USER))
+                .validate(currentUser.getId(), createTaskRequest.getBoardId(), LocalRoleName.LOCAL_ROLE_USER))
             return (ResponseEntity<?>) joinPoint.proceed();
         else
             return new ResponseEntity<>("Invalid permissions", HttpStatus.FORBIDDEN);

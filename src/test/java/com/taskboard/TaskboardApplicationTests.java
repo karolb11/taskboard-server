@@ -1,13 +1,17 @@
 package com.taskboard;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.Test;
+
+import java.util.Set;
 
 @SpringBootTest
-class TaskboardApplicationTests {
+public class TaskboardApplicationTests {
 
 	@Test
-	void contextLoads() {
+	public void contextLoads() {
+
 	}
 
 }

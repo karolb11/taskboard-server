@@ -1,26 +1,45 @@
 package com.taskboard.controller;
 
-import com.taskboard.payload.ChatMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.taskboard.payload.ChatMessageRequest;
+import com.taskboard.payload.ChatMessageResponse;
+import com.taskboard.payloadConverter.ChatMessageMapper;
+import com.taskboard.security.CurrentUser;
+import com.taskboard.security.UserPrincipal;
+import com.taskboard.service.ChatService;
+import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.websocket.server.PathParam;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("api/chat")
+@AllArgsConstructor
 public class ChatController {
-    final
-    SimpMessagingTemplate simpMessagingTemplate;
+    final private ChatService chatService;
 
-    public ChatController(SimpMessagingTemplate simpMessagingTemplate) {
-        this.simpMessagingTemplate = simpMessagingTemplate;
+    @PostMapping()
+    public ResponseEntity<?> addNewMessage(@CurrentUser UserPrincipal currentUser,
+                                           @RequestBody ChatMessageRequest chatMessageRequest) {
+        try {
+            chatService.addNewMessage(currentUser, chatMessageRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @MessageMapping("/send/message")
-    public void sendMessage(String message) {
-        System.out.println("received: "+message);
-        simpMessagingTemplate.convertAndSend("/message", message);
+    @GetMapping()
+    public ResponseEntity<?> getMessagesByBoardId(@CurrentUser UserPrincipal currentUser,
+                                                  @PathParam("boardId") Long boardId) {
+        List<ChatMessageResponse> res = chatService.getMessagesByBoardId(boardId)
+                .stream()
+                .map(ChatMessageMapper::chatMessageToChatMessageResponse)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 }

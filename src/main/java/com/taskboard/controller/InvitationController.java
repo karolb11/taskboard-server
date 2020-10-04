@@ -1,5 +1,6 @@
 package com.taskboard.controller;
 
+import com.taskboard.payload.ApiResponse;
 import com.taskboard.payload.BoardLocalGroupUserLinkRequest;
 import com.taskboard.payload.InvitationResponse;
 import com.taskboard.security.CurrentUser;
@@ -38,7 +39,8 @@ public class InvitationController {
     public ResponseEntity<?> acceptInvitation(@CurrentUser UserPrincipal currentUser, @PathVariable Long invitationId) {
         try {
             invitationService.acceptInvitation(invitationId);
-            return new ResponseEntity<>("Invitation accepted", HttpStatus.OK);
+            ApiResponse res = new ApiResponse(true, "invitation accepted");
+            return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -63,7 +65,8 @@ public class InvitationController {
                                               @PathVariable Long invitationId) {
         try {
             invitationService.deleteInvitation(invitationId);
-            return new ResponseEntity<>("Invitation deleted", HttpStatus.OK);
+            ApiResponse res = new ApiResponse(true, "invitation deleted");
+            return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

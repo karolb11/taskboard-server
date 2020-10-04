@@ -1,43 +1,45 @@
 package com.taskboard.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.taskboard.model.*;
+import com.taskboard.payload.BoardUserResponse;
 import com.taskboard.payload.CreateTaskRequest;
+import com.taskboard.payload.SubscribedTaskResponse;
 import com.taskboard.payload.UpdateTaskRequest;
 import com.taskboard.payloadConverter.SubTaskMapper;
+import com.taskboard.payloadConverter.SubscriptionMapper;
 import com.taskboard.repository.*;
 import com.taskboard.security.UserBoardPermissionsValidator;
 import javassist.NotFoundException;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
-    final
-    TaskRepository taskRepository;
-    final
-    TaskPriorityRepository taskPriorityRepository;
-    final
-    TaskStateRepository taskStateRepository;
-    final
-    UserRepository userRepository;
-    final
-    BoardRepository boardRepository;
-    final
-    UserBoardPermissionsValidator userBoardPermissionsValidator;
+    final TaskRepository taskRepository;
+    final TaskPriorityRepository taskPriorityRepository;
+    final TaskStateRepository taskStateRepository;
+    final UserRepository userRepository;
+    final BoardRepository boardRepository;
+    final UserBoardPermissionsValidator userBoardPermissionsValidator;
+    final SubscriptionService subscriptionService;
 
-    public TaskService(TaskRepository taskRepository, TaskPriorityRepository taskPriorityRepository, TaskStateRepository taskStateRepository, UserRepository userRepository, BoardRepository boardRepository, UserBoardPermissionsValidator userBoardPermissionsValidator) {
+    public TaskService(TaskRepository taskRepository,
+                       TaskPriorityRepository taskPriorityRepository,
+                       TaskStateRepository taskStateRepository,
+                       UserRepository userRepository,
+                       BoardRepository boardRepository,
+                       UserBoardPermissionsValidator userBoardPermissionsValidator,
+                       SubscriptionService subscriptionService) {
         this.taskRepository = taskRepository;
         this.taskPriorityRepository = taskPriorityRepository;
         this.taskStateRepository = taskStateRepository;
         this.userRepository = userRepository;
         this.boardRepository = boardRepository;
         this.userBoardPermissionsValidator = userBoardPermissionsValidator;
+        this.subscriptionService = subscriptionService;
     }
 
     @Transactional
@@ -110,5 +112,13 @@ public class TaskService {
     }
     public List<TaskState> getTaskStates() {
         return taskStateRepository.findAllByOrderById();
+    }
+
+    public List<Task> getActiveSubscribedTasksByUser(Long userId) {
+        List<Subscription> subscriptions = subscriptionService.findSubscriptionByUserId(userId);
+        return subscriptions.stream()
+                .map(Subscription::getTask)
+                .filter(i -> i.getState().getName() != TaskStateName.TASK_STATE_DONE)
+                .collect(Collectors.toList());
     }
 }

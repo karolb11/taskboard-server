@@ -1,6 +1,5 @@
 package com.taskboard.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.taskboard.model.*;
 import com.taskboard.payload.BoardRequest;
 import com.taskboard.payload.BoardUserResponse;
@@ -14,9 +13,7 @@ import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -69,7 +66,7 @@ public class BoardService {
     public Board addNewBoard(User user, BoardRequest boardRequest) throws NotFoundException {
         Board board = new Board(boardRequest.getName(), boardRequest.getDescription());
         board = boardRepository.save(board);
-        localRoleService.grantRoleToUser(board, user, LocalRoleName.LOCAL_ROLE_OWNER);
+        localRoleService.grantLocalRoleToUser(board, user, LocalRoleName.LOCAL_ROLE_OWNER);
         return board;
     }
 
@@ -96,7 +93,7 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
     public Set<BoardUserResponse> getBoardUsers(Long boardId) throws NotFoundException {
-        return getBoardMembersWithRole(boardId, localRoleService.findRole(LocalRoleName.LOCAL_ROLE_USER));
+        return getBoardMembersWithRole(boardId, localRoleService.findRoleByName(LocalRoleName.LOCAL_ROLE_USER));
     }
 
     public Set<BoardUserResponse> getBoardMembersWithRole(Long boardId, LocalRole localRole) throws NotFoundException {

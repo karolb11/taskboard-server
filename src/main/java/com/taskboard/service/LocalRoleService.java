@@ -1,6 +1,5 @@
 package com.taskboard.service;
 
-import com.taskboard.exception.BadRequestException;
 import com.taskboard.model.*;
 import com.taskboard.repository.BoardLocalGroupUserLinkRepository;
 import com.taskboard.repository.BoardRepository;
@@ -10,7 +9,6 @@ import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 
@@ -38,18 +36,29 @@ public class LocalRoleService {
     public LocalRole getUsersLocalRole(Long userId, Long boardId) throws NotFoundException {
         BoardLocalGroupUserLink boardLocalGroupUserLink = boardLocalGroupUserLinkRepository
                 .findFirstByUserIdAndBoardIdOrderByLocalRoleDesc(userId, boardId)
-                .orElseThrow(() -> new NotFoundException("Bad Request"));
+                .orElseThrow(() -> new NotFoundException("Not found"));
         return boardLocalGroupUserLink.getLocalRole();
     }
 
-    public void grantRoleToUser(Board board, User user, LocalRoleName roleName) throws NotFoundException {
-        LocalRole role = findRole(roleName);
+    public void grantLocalRoleToUser(Board board, User user, LocalRoleName roleName) throws NotFoundException {
+        LocalRole role = findRoleByName(roleName);
         BoardLocalGroupUserLink boardLocalGroupUserLink =
                 new BoardLocalGroupUserLink(board, role, user, true);
         boardLocalGroupUserLinkRepository.save(boardLocalGroupUserLink);
     }
 
-    LocalRole findRole(LocalRoleName roleName) throws NotFoundException {
+    public void setUsersLocalRole(Long boardLocalGroupUserLinkId, Long localRoleId) throws NotFoundException {
+        BoardLocalGroupUserLink boardLocalGroupUserLink =
+                boardLocalGroupUserLinkRepository.findById(boardLocalGroupUserLinkId)
+                .orElseThrow(() -> new NotFoundException("Not found"));
+        LocalRole role = localRoleRepository.findById(localRoleId)
+                .orElseThrow(() -> new NotFoundException("Not found"));
+
+        boardLocalGroupUserLink.setLocalRole(role);
+        boardLocalGroupUserLinkRepository.save(boardLocalGroupUserLink);
+    }
+
+    LocalRole findRoleByName(LocalRoleName roleName) throws NotFoundException {
         return localRoleRepository.findByName(roleName)
                 .orElseThrow(() -> new NotFoundException("role not found"));
     }

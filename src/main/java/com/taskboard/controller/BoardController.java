@@ -1,10 +1,7 @@
 package com.taskboard.controller;
 
 import com.taskboard.model.Board;
-import com.taskboard.payload.BoardDetailedViewResponse;
-import com.taskboard.payload.BoardRequest;
-import com.taskboard.payload.BoardUserResponse;
-import com.taskboard.payload.BoardViewResponse;
+import com.taskboard.payload.*;
 import com.taskboard.payloadConverter.BoardMapper;
 import com.taskboard.security.CurrentUser;
 import com.taskboard.security.UserPrincipal;
@@ -58,8 +55,8 @@ public class BoardController {
                                          @CurrentUser UserPrincipal currentUser,
                                          @RequestBody BoardRequest boardRequest) {
         try {
-            Board board = boardService.updateBoard(boardId, boardRequest);
-            BoardViewResponse res = new BoardViewResponse(board.getId(), board.getName(), board.getDescription());
+            boardService.updateBoard(boardId, boardRequest);
+            ApiResponse res = new ApiResponse(true, "Board setting saved");
             return new ResponseEntity<>(res, HttpStatus.CREATED);
         }
         catch (Exception e) {

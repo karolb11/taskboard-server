@@ -3,10 +3,7 @@ package com.taskboard.controller;
 import com.taskboard.model.Task;
 import com.taskboard.model.TaskPriority;
 import com.taskboard.model.TaskState;
-import com.taskboard.payload.CreateTaskRequest;
-import com.taskboard.payload.SubscribedTaskResponse;
-import com.taskboard.payload.UpdateTaskRequest;
-import com.taskboard.payload.TaskResponse;
+import com.taskboard.payload.*;
 import com.taskboard.payloadConverter.SubscriptionMapper;
 import com.taskboard.payloadConverter.TaskMapper;
 import com.taskboard.security.CurrentUser;
@@ -35,7 +32,8 @@ public class TaskController {
                                         @RequestBody CreateTaskRequest createTaskRequest) {
         try {
             taskService.createTask(createTaskRequest, currentUser.getId());
-            return new ResponseEntity<>("Task created!", HttpStatus.CREATED);
+            ApiResponse res = new ApiResponse(true, "Task created");
+            return new ResponseEntity<>(res, HttpStatus.OK);
         }catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

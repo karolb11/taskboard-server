@@ -7,6 +7,7 @@ import com.taskboard.security.CurrentUser;
 import com.taskboard.security.UserPrincipal;
 import com.taskboard.service.BoardService;
 import javassist.NotFoundException;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -77,7 +78,8 @@ public class BoardController {
     }
 
     @GetMapping("{boardId}/members") //all members
-    public ResponseEntity<?> getBoardMembers(@CurrentUser UserPrincipal currentUser, @PathVariable Long boardId) {
+    public ResponseEntity<?> getBoardMembers(@CurrentUser UserPrincipal currentUser,
+                                             @PathVariable("boardId") Long boardId) {
         try {
             List<BoardUserResponse> boardMembers = boardService.getBoardMembers(boardId);
             return new ResponseEntity<>(boardMembers, HttpStatus.OK);

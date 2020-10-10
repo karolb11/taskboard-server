@@ -10,6 +10,7 @@ import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
@@ -23,6 +24,9 @@ public class ChatController {
     final private ChatService chatService;
 
     @PostMapping()
+    @PreAuthorize("hasAuthority('board'+#chatMessageRequest.boardId+':'+'LOCAL_ROLE_VIEWER')" +
+            "or hasAuthority('board'+#chatMessageRequest.boardId+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+#chatMessageRequest.boardId+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> addNewMessage(@CurrentUser UserPrincipal currentUser,
                                            @RequestBody ChatMessageRequest chatMessageRequest) {
         try {
@@ -34,6 +38,9 @@ public class ChatController {
     }
 
     @GetMapping()
+    @PreAuthorize("hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_VIEWER')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> getMessagesByBoardId(@CurrentUser UserPrincipal currentUser,
                                                   @PathParam("boardId") Long boardId) {
         List<ChatMessageResponse> res = chatService.getMessagesByBoardId(boardId)

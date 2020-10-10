@@ -31,6 +31,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
+    //not needed to be secured
     public ResponseEntity<?> getMyUser(@CurrentUser UserPrincipal currentUser) {
         try {
             User user = userService.findUserById(currentUser.getId());

@@ -8,11 +8,13 @@ import com.taskboard.payloadConverter.CommentMapper;
 import com.taskboard.security.CurrentUser;
 import com.taskboard.security.UserPrincipal;
 import com.taskboard.service.CommentService;
+import com.taskboard.utils.ResourceIdUtils;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
@@ -26,11 +28,13 @@ public class CommentController {
 
     private final CommentService commentService;
     private final CommentMapper commentMapper;
-
+    private final ResourceIdUtils resourceIdUtils;
 
     @GetMapping()
+    @PreAuthorize("hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_VIEWER')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> getCommentsByTaskId(
-            @CurrentUser UserPrincipal currentUser,
             @PathParam("taskId") Long taskId
     ) {
         try {
@@ -45,6 +49,9 @@ public class CommentController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_VIEWER')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> addNewComment(
             @CurrentUser UserPrincipal currentUser,
             @PathParam("taskId") Long taskId,

@@ -4,12 +4,13 @@ import com.taskboard.model.Task;
 import com.taskboard.model.TaskPriority;
 import com.taskboard.model.TaskState;
 import com.taskboard.payload.*;
-import com.taskboard.payloadConverter.SubscriptionMapper;
 import com.taskboard.payloadConverter.TaskMapper;
 import com.taskboard.security.CurrentUser;
 import com.taskboard.security.UserPrincipal;
 import com.taskboard.service.TaskService;
+import com.taskboard.utils.ResourceIdUtils;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,14 +21,14 @@ import java.util.List;
 @RestController
 @PreAuthorize("hasRole('USER')")
 @RequestMapping("/api/task")
+@AllArgsConstructor
 public class TaskController {
-    final TaskService taskService;
-
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
-    }
+    private final TaskService taskService;
+    private final ResourceIdUtils resourceIdUtils;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('board'+#createTaskRequest.getBoardId()+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+#createTaskRequest.getBoardId()+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> createTask(@CurrentUser UserPrincipal currentUser,
                                         @RequestBody CreateTaskRequest createTaskRequest) {
         try {
@@ -40,8 +41,10 @@ public class TaskController {
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<?> getTaskById(@CurrentUser UserPrincipal currentUser,
-                                         @PathVariable("taskId") Long taskId) {
+    @PreAuthorize("hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_VIEWER')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_OWNER')")
+    public ResponseEntity<?> getTaskById(@PathVariable("taskId") Long taskId) {
         try {
             Task task = taskService.getTaskById(taskId);
             TaskResponse response = new TaskResponse(task);
@@ -52,8 +55,9 @@ public class TaskController {
     }
 
     @PutMapping("/{taskId}")
-    public ResponseEntity<?> updateTask(@CurrentUser UserPrincipal currentUser,
-                                        @PathVariable("taskId") Long taskId,
+    @PreAuthorize("hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_OWNER')")
+    public ResponseEntity<?> updateTask(@PathVariable("taskId") Long taskId,
                                         @RequestBody UpdateTaskRequest updateTaskRequest) {
         try {
             Task task = taskService.updateTask(taskId, updateTaskRequest);
@@ -65,6 +69,7 @@ public class TaskController {
     }
 
     @GetMapping("/subscribed")
+    //not needed to be secured
     public ResponseEntity<?> getActiveSubscribedTasksByUser(@CurrentUser UserPrincipal currentUser) {
         List<Task> tasks = taskService.getActiveSubscribedTasksByUser(currentUser.getId());
         List<SubscribedTaskResponse> response =
@@ -73,12 +78,14 @@ public class TaskController {
     }
 
     @GetMapping("/priority")
+    //not needed to be secured
     public ResponseEntity<?> getTaskPriorities() {
         List<TaskPriority> taskPriorities = taskService.getTaskPriorities();
         return new ResponseEntity<>(taskPriorities, HttpStatus.OK);
     }
 
     @GetMapping("state")
+    //not needed to be secured
     public ResponseEntity<?> getTaskStates() {
         List<TaskState> taskStates = taskService.getTaskStates();
         return new ResponseEntity<>(taskStates, HttpStatus.OK);

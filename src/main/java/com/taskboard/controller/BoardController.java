@@ -39,10 +39,13 @@ public class BoardController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getBoardById(@CurrentUser UserPrincipal currentUser, @PathVariable("id") Long id) {
+    @GetMapping("/{boardId}")
+    @PreAuthorize("hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_VIEWER')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_OWNER')")
+    public ResponseEntity<?> getBoardById(@PathVariable("boardId") Long boardId) {
         try {
-            Board board = boardService.getBoardById(id);
+            Board board = boardService.getBoardById(boardId);
             BoardDetailedViewResponse res = BoardMapper.boardToBoardDetailedView(board);
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (NotFoundException e) {
@@ -52,6 +55,7 @@ public class BoardController {
     }
 
     @PutMapping("/{boardId}")
+    @PreAuthorize("hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> updateBoard(@PathVariable Long boardId,
                                          @CurrentUser UserPrincipal currentUser,
                                          @RequestBody BoardRequest boardRequest) {
@@ -59,8 +63,7 @@ public class BoardController {
             boardService.updateBoard(boardId, boardRequest);
             ApiResponse res = new ApiResponse(true, "Board setting saved");
             return new ResponseEntity<>(res, HttpStatus.CREATED);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -71,13 +74,15 @@ public class BoardController {
             Board board = boardService.addNewBoard(currentUser.getId(), boardRequest);
             BoardViewResponse res = new BoardViewResponse(board.getId(), board.getName(), board.getDescription());
             return new ResponseEntity<>(res, HttpStatus.CREATED);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("{boardId}/members") //all members
+    @PreAuthorize("hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_VIEWER')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> getBoardMembers(@CurrentUser UserPrincipal currentUser,
                                              @PathVariable("boardId") Long boardId) {
         try {
@@ -87,7 +92,11 @@ public class BoardController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
     @GetMapping("{boardId}/users") //members with at least USER role
+    @PreAuthorize("hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_VIEWER')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> getBoardUsers(
             @CurrentUser UserPrincipal userPrincipal,
             @PathVariable Long boardId) {
@@ -100,6 +109,4 @@ public class BoardController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
-
 }

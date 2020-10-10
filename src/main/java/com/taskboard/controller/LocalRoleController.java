@@ -30,6 +30,7 @@ public class LocalRoleController {
     }
 
     @GetMapping("/my")
+    //not needed to be secured
     public ResponseEntity<?> getLocalRole(@CurrentUser UserPrincipal currentUser, @RequestParam Long boardId) {
         try {
             LocalRole role = localRoleService.getUsersLocalRole(currentUser.getId(), boardId);

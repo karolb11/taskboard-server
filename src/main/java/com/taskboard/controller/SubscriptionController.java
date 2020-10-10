@@ -3,10 +3,14 @@ package com.taskboard.controller;
 import com.taskboard.security.CurrentUser;
 import com.taskboard.security.UserPrincipal;
 import com.taskboard.service.SubscriptionService;
+import com.taskboard.utils.ResourceIdUtils;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
@@ -15,15 +19,16 @@ import javax.websocket.server.PathParam;
 @RestController
 @PreAuthorize("hasRole('USER')")
 @RequestMapping("/api/subscription")
+@AllArgsConstructor
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
-
-    public SubscriptionController(SubscriptionService subscriptionService) {
-        this.subscriptionService = subscriptionService;
-    }
+    private final ResourceIdUtils resourceIdUtils;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_VIEWER')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_USER')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> subscribeTask(@CurrentUser UserPrincipal currentUser,
                                            @RequestBody Long taskId) {
         try {
@@ -35,6 +40,7 @@ public class SubscriptionController {
     }
 
     @GetMapping
+    //not needs to be secured
     public ResponseEntity<?> isTaskSubscribedByUser(@CurrentUser UserPrincipal currentUser,
                                                     @PathParam("taskId") Long taskId) {
         boolean res = subscriptionService.isTaskSubscribedByUser(currentUser.getId(), taskId);
@@ -42,6 +48,7 @@ public class SubscriptionController {
     }
 
     @DeleteMapping
+    //not needs to be secured
     public ResponseEntity<?> deleteSubscription(@CurrentUser UserPrincipal currentUser,
                                                 @PathParam("taskId") Long taskId) {
         try {

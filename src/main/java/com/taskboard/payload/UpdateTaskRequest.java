@@ -5,6 +5,7 @@ import com.taskboard.model.TaskState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class UpdateTaskRequest {
     private String name;
     private String description;
+    @Nullable
     private Long assignedUserId;
     private Long priorityId;
     private Long stateId;

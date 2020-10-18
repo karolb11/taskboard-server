@@ -3,6 +3,7 @@ package com.taskboard.security;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.taskboard.model.User;
 import com.taskboard.utils.RoleUtils;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,29 +14,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 public class UserPrincipal implements UserDetails {
-    private Long id;
-
-    private String name;
-
-    private String username;
-
+    private final Long id;
+    private final String name;
+    private final String username;
     @JsonIgnore
-    private String email;
-
+    private final String email;
     @JsonIgnore
-    private String password;
-
-    private Collection<? extends GrantedAuthority> authorities;
-
-    public UserPrincipal(Long id, String name, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.name = name;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-    }
+    private final String password;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public static UserPrincipal create(User user) {
         List<GrantedAuthority> authorities = RoleUtils.UserAuthoritiesAsList(user);

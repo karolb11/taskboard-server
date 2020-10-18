@@ -35,7 +35,8 @@ public class RoleUtils {
     }
 
     private static List<GrantedAuthority> getUsersLocalAuthorities(User user) {
-        List<BoardLocalGroupUserLink> roles = boardLocalGroupUserLinkRepository.findByUser(user);
+        List<BoardLocalGroupUserLink> roles =
+                boardLocalGroupUserLinkRepository.findByUser(user);
         return roles.stream()
                 .filter(BoardLocalGroupUserLink::isAccepted)
                 .map(role ->

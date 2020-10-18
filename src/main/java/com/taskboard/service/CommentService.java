@@ -37,4 +37,11 @@ public class CommentService {
         taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("task not exist"));
         return commentRepository.findByTaskIdOrderById(taskId);
     }
+
+    public void updateComment(Long commentId, String content) throws NotFoundException {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("comment not exist"));
+        comment.setContent(content);
+        commentRepository.save(comment);
+    }
 }

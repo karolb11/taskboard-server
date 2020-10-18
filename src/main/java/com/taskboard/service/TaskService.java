@@ -47,7 +47,7 @@ public class TaskService {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new NotFoundException("user not found"));
         User assignedUser = userRepository.findById(createTaskRequest.getAssignedUserId())
-                .orElseThrow(() -> new NotFoundException("user not found"));
+                .orElse(null);
         Board board = boardRepository.findBoardById(createTaskRequest.getBoardId())
                 .orElseThrow(() -> new NotFoundException("board not found"));
         TaskPriority priority = taskPriorityRepository.findById(createTaskRequest.getPriorityId())
@@ -82,8 +82,11 @@ public class TaskService {
     public Task updateTask(Long taskId, UpdateTaskRequest request) throws NotFoundException {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("task not found"));
-        User assignedUser = userRepository.findById(request.getAssignedUserId())
-                .orElseThrow(() -> new NotFoundException("user not found"));
+        User assignedUser = null;
+        if(request.getAssignedUserId() != null) {
+            assignedUser = userRepository.findById(request.getAssignedUserId())
+                    .orElseThrow(() -> new NotFoundException("user not found"));
+        }
         TaskPriority priority = taskPriorityRepository.findById(request.getPriorityId())
                 .orElseThrow(() -> new NotFoundException("priority not found"));
         TaskState state = taskStateRepository.findById(request.getStateId())

@@ -40,7 +40,8 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}")
-    @PreAuthorize("hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_VIEWER')" +
+    @PreAuthorize("hasAuthority('ROLE_MOD') or hasAuthority('ROLE_ADMIN')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_VIEWER')" +
             "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_USER')" +
             "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> getBoardById(@PathVariable("boardId") Long boardId) {
@@ -55,7 +56,8 @@ public class BoardController {
     }
 
     @PutMapping("/{boardId}")
-    @PreAuthorize("hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_OWNER')")
+    @PreAuthorize("hasAuthority('ROLE_MOD') or hasAuthority('ROLE_ADMIN')" +
+            "or hasAuthority('board'+#boardId+':'+'LOCAL_ROLE_OWNER')")
     public ResponseEntity<?> updateBoard(@PathVariable Long boardId,
                                          @CurrentUser UserPrincipal currentUser,
                                          @RequestBody BoardRequest boardRequest) {

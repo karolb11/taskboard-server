@@ -2,10 +2,12 @@ package com.taskboard.controller;
 
 import com.taskboard.model.Comment;
 import com.taskboard.model.Task;
+import com.taskboard.payload.ApiResponse;
 import com.taskboard.payload.CommentResponse;
 import com.taskboard.payload.TaskResponse;
 import com.taskboard.payloadConverter.CommentMapper;
 import com.taskboard.security.CurrentUser;
+import com.taskboard.security.EditCommentSecurityGuard;
 import com.taskboard.security.UserPrincipal;
 import com.taskboard.service.CommentService;
 import com.taskboard.utils.ResourceIdUtils;
@@ -29,6 +31,7 @@ public class CommentController {
     private final CommentService commentService;
     private final CommentMapper commentMapper;
     private final ResourceIdUtils resourceIdUtils;
+    private final EditCommentSecurityGuard editCommentSecurityGuard;
 
     @GetMapping()
     @PreAuthorize("hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_VIEWER')" +
@@ -60,6 +63,22 @@ public class CommentController {
         try {
             commentService.addNewComment(currentUser, taskId, content);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/{commentId}")
+    @PreAuthorize("hasAuthority('ROLE_MOD') or hasAuthority('ROLE_ADMIN')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByCommentId(#commentId)+':'+'LOCAL_ROLE_OWNER')" +
+            "or @editCommentSecurityGuard.isCommentAuthor(#commentId, #currentUser.getId())")
+    public ResponseEntity<?> updateComment(@CurrentUser UserPrincipal currentUser,
+                                           @PathVariable Long commentId,
+                                           @RequestBody String content) {
+        try {
+            commentService.updateComment(commentId, content);
+            ApiResponse res = new ApiResponse(true, "Comment edited");
+            return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

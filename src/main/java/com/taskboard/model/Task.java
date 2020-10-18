@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -42,6 +43,7 @@ public class Task extends DateAudit {
 
     @ManyToOne
     @JoinColumn(name = "assigned_user_id")
+    @Nullable
     private User assignedUser;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

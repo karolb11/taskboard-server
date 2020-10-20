@@ -17,7 +17,7 @@ import javax.websocket.server.PathParam;
 
 
 @RestController
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/subscription")
 @AllArgsConstructor
 public class SubscriptionController {

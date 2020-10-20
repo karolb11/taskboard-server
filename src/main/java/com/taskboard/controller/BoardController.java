@@ -18,8 +18,8 @@ import java.util.Set;
 
 
 @RestController
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("api/board")
-@PreAuthorize("hasRole('USER')")
 public class BoardController {
 
     final

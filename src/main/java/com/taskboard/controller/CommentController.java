@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/comment")
 @AllArgsConstructor
 public class CommentController {

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("api/chat")
 @AllArgsConstructor
 public class ChatController {

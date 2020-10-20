@@ -25,6 +25,7 @@ public class SubTaskMapper {
                         .id(subTaskRequest.getId())
                         .name(subTaskRequest.getName())
                         .description(subTaskRequest.getDescription())
+                        .done(subTaskRequest.isDone())
                         .build()
         ).collect(Collectors.toList());
     }

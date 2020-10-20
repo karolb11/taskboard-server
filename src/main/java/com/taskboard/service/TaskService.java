@@ -61,6 +61,7 @@ public class TaskService {
                 subTaskRequest -> SubTask.builder()
                         .name(subTaskRequest.getName())
                         .description(subTaskRequest.getDescription())
+                        .done(subTaskRequest.isDone())
                         .build()
         ).collect(Collectors.toList());
 

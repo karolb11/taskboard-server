@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @RestController
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/user")
 public class UserController {
 

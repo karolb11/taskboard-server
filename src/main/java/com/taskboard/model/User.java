@@ -48,6 +48,8 @@ public class User extends DateAudit {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
+    private boolean enabled;
+
     @OneToMany
     @JoinColumn(name = "user_id")
     private List<BoardLocalGroupUserLink> boardLocalGroupUserLinks;
@@ -61,6 +63,7 @@ public class User extends DateAudit {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.enabled = true;
     }
 
 }

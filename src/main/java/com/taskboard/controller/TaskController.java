@@ -57,14 +57,26 @@ public class TaskController {
     @PutMapping("/{taskId}")
     @PreAuthorize("hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_USER')" +
             "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_OWNER')")
-    public ResponseEntity<?> updateTask(@PathVariable("taskId") Long taskId,
-                                        @RequestBody UpdateTaskRequest updateTaskRequest) {
+    public ResponseEntity<?> editTask(@PathVariable("taskId") Long taskId,
+                                      @RequestBody UpdateTaskRequest updateTaskRequest) {
         try {
             Task task = taskService.updateTask(taskId, updateTaskRequest);
             TaskResponse response = new TaskResponse(task);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/{taskId}/archive")
+    @PreAuthorize("hasAuthority('ROLE_MOD') or hasAuthority('ROLE_ADMIN')" +
+            "or hasAuthority('board'+@resourceIdUtils.getBoardIdByTaskId(#taskId)+':'+'LOCAL_ROLE_OWNER')")
+    public ResponseEntity<?> archiveTask(@PathVariable("taskId") Long taskId) {
+        try {
+            taskService.archiveTaskById(taskId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 

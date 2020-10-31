@@ -22,6 +22,8 @@ import java.util.Set;
 @RequestMapping("api/board")
 public class BoardController {
 
+    //todo: board archiving
+
     final
     BoardService boardService;
 

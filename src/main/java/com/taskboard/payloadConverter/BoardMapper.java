@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class BoardMapper {
     public static BoardDetailedViewResponse boardToBoardDetailedView(Board board) {
-        List<Task> tasks = board.getTasks();
+        List<Task> tasks = board.getTasks()
+                .stream()
+                .filter(task -> !task.isArchived())
+                .collect(Collectors.toList());
         Set<TaskResponse> toDo = new HashSet<>();
         Set<TaskResponse> inProgress = new HashSet<>();
         Set<TaskResponse> done = new HashSet<>();

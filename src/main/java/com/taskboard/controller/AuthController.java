@@ -35,7 +35,6 @@ import java.net.URI;
 import java.util.Collections;
 
 @RestController
-@PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/auth")
 @AllArgsConstructor
 public class AuthController {

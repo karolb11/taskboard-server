@@ -122,7 +122,14 @@ public class TaskService {
         List<Subscription> subscriptions = subscriptionService.findSubscriptionByUserId(userId);
         return subscriptions.stream()
                 .map(Subscription::getTask)
-                .filter(i -> i.getState().getName() != TaskStateName.TASK_STATE_DONE)
+                .filter(i -> i.getState().getName() != TaskStateName.TASK_STATE_DONE && !i.isArchived())
                 .collect(Collectors.toList());
+    }
+
+    public void archiveTaskById(Long taskId) throws NotFoundException {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Task not found"));
+        task.setArchived(true);
+        taskRepository.save(task);
     }
 }

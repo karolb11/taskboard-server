@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.taskboard</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>TaskBoard-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>taskboard</name>
 	<description>taskboard project for Spring Boot</description>
@@ -99,12 +99,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
 
     </dependencies>
 

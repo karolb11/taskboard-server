@@ -10,6 +10,7 @@ import com.taskboard.payloadConverter.SubscriptionMapper;
 import com.taskboard.repository.*;
 import com.taskboard.security.UserBoardPermissionsValidator;
 import javassist.NotFoundException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class TaskService {
     final TaskRepository taskRepository;
     final TaskPriorityRepository taskPriorityRepository;
@@ -25,22 +27,6 @@ public class TaskService {
     final BoardRepository boardRepository;
     final UserBoardPermissionsValidator userBoardPermissionsValidator;
     final SubscriptionService subscriptionService;
-
-    public TaskService(TaskRepository taskRepository,
-                       TaskPriorityRepository taskPriorityRepository,
-                       TaskStateRepository taskStateRepository,
-                       UserRepository userRepository,
-                       BoardRepository boardRepository,
-                       UserBoardPermissionsValidator userBoardPermissionsValidator,
-                       SubscriptionService subscriptionService) {
-        this.taskRepository = taskRepository;
-        this.taskPriorityRepository = taskPriorityRepository;
-        this.taskStateRepository = taskStateRepository;
-        this.userRepository = userRepository;
-        this.boardRepository = boardRepository;
-        this.userBoardPermissionsValidator = userBoardPermissionsValidator;
-        this.subscriptionService = subscriptionService;
-    }
 
     @Transactional
     public void createTask(CreateTaskRequest createTaskRequest, Long authorId) throws NotFoundException {

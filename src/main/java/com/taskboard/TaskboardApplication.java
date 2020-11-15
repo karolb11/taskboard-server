@@ -1,5 +1,6 @@
 package com.taskboard;
 
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -29,5 +30,9 @@ public class TaskboardApplication extends SpringBootServletInitializer {
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(TaskboardApplication.class);
+	}
+
+	private static SpringApplicationBuilder configureApplication(SpringApplicationBuilder builder) {
+		return builder.sources(TaskboardApplication.class).bannerMode(Banner.Mode.OFF);
 	}
 }

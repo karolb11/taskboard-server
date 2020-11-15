@@ -32,7 +32,4 @@ public class TaskboardApplication extends SpringBootServletInitializer {
 		return application.sources(TaskboardApplication.class);
 	}
 
-	private static SpringApplicationBuilder configureApplication(SpringApplicationBuilder builder) {
-		return builder.sources(TaskboardApplication.class).bannerMode(Banner.Mode.OFF);
-	}
 }

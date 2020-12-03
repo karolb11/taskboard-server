@@ -21,9 +21,6 @@ import java.util.Set;
 @PreAuthorize("isAuthenticated()")
 @RequestMapping("api/board")
 public class BoardController {
-
-    //todo: board archiving
-
     final
     BoardService boardService;
 
@@ -32,6 +29,13 @@ public class BoardController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_MOD') or hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> getAllBoards() {
+        List<BoardViewResponse> boards = boardService.getAllBoards();
+        return new ResponseEntity<>(boards, HttpStatus.OK);
+    }
+
+    @GetMapping("/my")
     public ResponseEntity<?> getUserBoards(@CurrentUser UserPrincipal userPrincipal) {
         try {
             List<BoardViewResponse> usersBoards = boardService.getUsersBoards(userPrincipal.getId());
@@ -109,7 +113,17 @@ public class BoardController {
             return new ResponseEntity<>(boardUsers, HttpStatus.OK);
 
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/{id}/archive")
+    @PreAuthorize("hasAuthority('ROLE_MOD') or hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> archiveBoard(CurrentUser userPrincipal, @PathVariable Long id) {
+        try {
+            boardService.archiveBoard(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

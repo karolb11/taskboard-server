@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.ValidationException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,6 +31,14 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping()
+    @PreAuthorize("hasAuthority('ROLE_MOD') or hasAuthority('ROLE_ADMIN')")
+    //not needed to be secured
+    public ResponseEntity<?> findAll() {
+        List<UserResponse> res = userService.findAll();
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @GetMapping("/me")
@@ -52,6 +61,33 @@ public class UserController {
             userService.updateUser(userId, updateUserRequest);
             return new ResponseEntity<>(new ApiResponse(true, "account updated"), HttpStatus.OK);
         } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PatchMapping("/{userId}/role")
+    @PreAuthorize("hasAuthority('ROLE_MOD') or hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> updateRole(@CurrentUser UserPrincipal currentUser,
+                                        @PathVariable Long userId,
+                                        @RequestBody Long roleId) {
+        try {
+            userService.updateUserRole(userId, roleId);
+            return new ResponseEntity<>(new ApiResponse(true, "account updated"), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PatchMapping("/{userId}/deactivate")
+    @PreAuthorize("hasAuthority('ROLE_MOD') or hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> deactivate(@CurrentUser UserPrincipal currentUser,
+                                        @PathVariable Long userId) {
+        try {
+            userService.deactivateUser(userId);
+            return new ResponseEntity<>(new ApiResponse(true, "account updated"), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

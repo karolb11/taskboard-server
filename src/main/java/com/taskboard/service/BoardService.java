@@ -41,6 +41,13 @@ public class BoardService {
         this.localRoleService = localRoleService;
     }
 
+    public List<BoardViewResponse> getAllBoards() {
+        return boardRepository.findAll().stream()
+                .filter(board -> !board.isArchived())
+                .map(BoardMapper::boardToBoardViewResponse)
+                .collect(Collectors.toList());
+    }
+
     public List<BoardViewResponse> getUsersBoards(Long userId) throws NotFoundException {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("wrong userId"));
         return getUsersBoards(user);
@@ -53,7 +60,7 @@ public class BoardService {
                 .stream()
                 .map(link -> link.getBoard().getId())
                 .collect(Collectors.toSet());
-        return boardRepository.findBoardViewByIdIn(boardIds);
+        return boardRepository.findBoardViewByIdInAndArchivedIsFalse(boardIds);
     }
 
     @Transactional
@@ -104,5 +111,13 @@ public class BoardService {
                 .map(i -> new BoardUserResponse(i.getUser().getId(), i.getUser().getName()))
                 .collect(Collectors.toSet());
         return users;
+    }
+
+
+    public void archiveBoard(Long id) throws NotFoundException {
+        Board board = boardRepository.findBoardById(id)
+                .orElseThrow(() -> new NotFoundException("Board not found"));
+        board.setArchived(true);
+        boardRepository.save(board);
     }
 }

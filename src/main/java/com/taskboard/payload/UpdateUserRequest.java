@@ -10,6 +10,7 @@ public class UpdateUserRequest {
     private String newPassword;
     private String confirmNewPassword;
     private String currentPassword;
+    private String role;
 
     public enum UpdateType {
         UPDATE_DATA,

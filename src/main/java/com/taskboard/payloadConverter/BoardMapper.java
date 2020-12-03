@@ -4,6 +4,7 @@ import com.taskboard.model.Board;
 import com.taskboard.model.Task;
 import com.taskboard.model.TaskStateName;
 import com.taskboard.payload.BoardDetailedViewResponse;
+import com.taskboard.payload.BoardViewResponse;
 import com.taskboard.payload.TaskResponse;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +33,9 @@ public class BoardMapper {
                 }
         );
         return new BoardDetailedViewResponse(board.getName(), board.getDescription(), toDo, inProgress, done);
+    }
+
+    public static BoardViewResponse boardToBoardViewResponse(Board board) {
+        return new BoardViewResponse(board.getId(), board.getName(), board.getDescription());
     }
 }

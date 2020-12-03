@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     List<BoardViewResponse> findBoardViewByIdIn(Iterable<Long> ids);
+    List<BoardViewResponse> findBoardViewByIdInAndArchivedIsFalse(Iterable<Long> ids);
     Optional<Board> findBoardById(Long id);
 
 }
